@@ -38,84 +38,102 @@ namespace Tavisca.Bootcamp.LanguageBasics.Exercise1
             Console.WriteLine($"Diet plan = [{string.Join(", ", dietPlans)}]");
             Console.WriteLine(result);
         }
-        public static List<int> MaxValIndex(int[] arr, List<int> l)
+        
+        public static List<int> CreateList(int length)
         {
-            int max = int.MinValue;
+            List<int> indexList = new List<int>();
 
-            foreach(int i in l)
+            for(int j=0;j<length;j++)
+                indexList.Add(j);
+            
+             return indexList;
+        }
+        public static List<int> MaximumValueIndex(int[] nutrients, List<int> indexList)
+        {
+            int maximum = int.MinValue;
+
+            foreach(int i in indexList)//find maximum value meal 
             {
-                if(max < arr[i])
-                    max = arr[i];
+                if(maximum < nutrients[i])
+                    maximum = nutrients[i];
             }
             
-            List<int> r = new List<int>();
-            foreach(int i in l)
+            List<int> updatedList = new List<int>();
+
+            foreach(int i in indexList)//create a list for same maximum value meals
             {
-                if(max == arr[i])
-                    r.Add(i);
+                if(maximum == nutrients[i])
+                    updatedList.Add(i);
             }
-            return r;
+            return updatedList;
         }
-         private static List<int> MinValIndex(int[] arr, List<int> l)
+         private static List<int> MinimumValueIndex(int[] nutrients, List<int> indexList)
         {
             int min = int.MaxValue;
 
-            foreach(int i in l)
+            foreach(int i in indexList)//find minimum value meal 
             {
-                if(min > arr[i])
-                    min = arr[i];
+                if(min > nutrients[i])
+                    min = nutrients[i];
             }
             
-            List<int> r = new List<int>();
-            foreach(int i in l)
+            List<int> updatedList = new List<int>();
+
+            foreach(int i in indexList)//create a list for same minimum value meals
             {
-                if(min == arr[i])
-                    r.Add(i);
+                if(min == nutrients[i])
+                    updatedList.Add(i);
             }
-            return r;
+            return updatedList;
+        }
+        public static int[] CalculateCalorie(int[] protein, int[] carbs, int[] fat,int length)
+        {
+            //calculate calorie array according to protein,fat and carbs
+
+            int[] calorie=new int[length];
+
+            for(int i=0;i<length;i++)
+                calorie[i] = (protein[i] +carbs[i])*5 + (fat[i] * 9);
+
+            return calorie;
+
         }
         public static int[] SelectMeals(int[] protein, int[] carbs, int[] fat, string[] dietPlans)
         {
-            int len = carbs.Length;
-            int[] cal = new int[len];
+            int length = carbs.Length;
+            int[] calorie = CalculateCalorie(protein,carbs,fat,length);//calculate calorie array according to protein,fat and carbs
 
-            for(int i=0;i<len;i++)
-                cal[i] = (protein[i] +carbs[i])*5 + (fat[i] * 9);
-            
-            int dp_length = dietPlans.Length;
-            int[] res = new int[dp_length];
+            int lengthOfDietPlan = dietPlans.Length;
+            int[] resultantIndex = new int[lengthOfDietPlan];//resultantInde array for each DietPlan
 
-            for(int i=0;i<dp_length;i++)
+            for(int i=0;i<lengthOfDietPlan;i++)
             {
-                List<int> list = new List<int>();
-                for(int j=0;j<len;j++)
-                    list.Add(j);
+
+                List<int> indexList = CreateList(length);//list to keep track of the index of meals
 
                 for(int j=0;j<dietPlans[i].Length;j++)
                 {
                     if(dietPlans[i][j] == 't')
-                        list = MinValIndex(cal, list);
+                        indexList = MinimumValueIndex(calorie, indexList);
                     else if(dietPlans[i][j] == 'p')
-                        list = MinValIndex(protein, list);
+                        indexList = MinimumValueIndex(protein, indexList);
                     else if(dietPlans[i][j] == 'c')
-                        list = MinValIndex(carbs, list);
+                        indexList = MinimumValueIndex(carbs, indexList);
                     else if(dietPlans[i][j] == 'f')
-                        list = MinValIndex(fat, list);
+                        indexList = MinimumValueIndex(fat, indexList);
                     else if(dietPlans[i][j] == 'T')
-                        list = MaxValIndex(cal, list);
+                        indexList = MaximumValueIndex(calorie, indexList);
                     else if(dietPlans[i][j] == 'P')
-                        list = MaxValIndex(protein, list);
+                        indexList = MaximumValueIndex(protein, indexList);
                     else if(dietPlans[i][j] == 'C')
-                        list = MaxValIndex(carbs, list);
+                        indexList = MaximumValueIndex(carbs, indexList);
                     else if(dietPlans[i][j] == 'F')
-                        list = MaxValIndex(fat, list);
+                        indexList = MaximumValueIndex(fat, indexList);
                 }
 
-                res[i] = list.Min();
+                resultantIndex[i] = indexList.Min();
             }
-
-            
-            return res;
+            return resultantIndex;
         }
     }
 }
